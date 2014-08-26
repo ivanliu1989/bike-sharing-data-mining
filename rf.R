@@ -1,0 +1,10 @@
+setwd(choose.dir())
+require(caret)
+require(Metrics)
+require(lubridate)
+require(randomForest)
+
+train <- read.csv('Data/train.csv', head=T, stringsAsFactor=F)
+test <- read.csv('Data/test.csv', head=T, stringsAsFactor=F)
+str(train)
+str(test)
