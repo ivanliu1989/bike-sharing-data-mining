@@ -1,4 +1,4 @@
-setwd(choose.dir())
+setwd("C:\\Users\\Ivan.Liuyanfeng\\Desktop\\Data_Mining_Work_Space\\bike-sharing-data-mining")
 train <- read.csv('Data/train.csv', head=T, stringsAsFactor=F)
 test <- read.csv('Data/test.csv', head=T, stringsAsFactor=F)
 str(train)
