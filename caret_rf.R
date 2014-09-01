@@ -19,7 +19,7 @@ fitControl <- trainControl(method='repeatedcv', # 10-fold CV
 # boosted tree model
 gbmFit1 <- train(count ~ season + holiday + weather + wd+ hour + temp + atemp
                  + humidity + windspeed,
-                 data=train, method='gbm', trControl = fitControl, verbose=F)
+                 data=train, method='rf', trControl = fitControl, verbose=F)
 gbmFit1
 nrow(test)
 trellis.par.set(caretTheme())
