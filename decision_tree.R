@@ -20,15 +20,16 @@ test <- df[-trainIndex,]
 # scaledTrain <- predict(preProcValue, df)
 
 
-cvCtrl <- trainControl(method='repeatedcv',repeats=3, summaryFunction=twoClassSummary, classProbs=T)
+# cvCtrl <- trainControl(method='repeatedcv',repeats=3, summaryFunction=twoClassSummary)
 set.seed(8888)
-rpartTune <- train(count~.,data=train,method='rpart', tuneLength=30, metric='ROC',trControl=cvCtrl)
-
+# rpartTune <- train(count~.,data=train,method='rpart', tuneLength=30,trControl=cvCtrl)
+rpartTune <- train(count~season + holiday + weather + wd+ hour + temp + atemp
+                   + humidity + windspeed, data=train,method='rpart')
 plot(rpartTune, scales=list(x=list(log=10)))
 
 rpartPred <- predict(rpartTune, test)
 # confusionMatrix(rpartPred,test$Class)
-rpartProbs <- predict(rpartTune, test, type='probs')
+rpartProbs <- predict(rpartTune, test, type='prob')
 
 library(pROC)
 rpartROC <- roc(test$Count, rpartProbs[,'PS'], levels=rev(testProbs$Class))
