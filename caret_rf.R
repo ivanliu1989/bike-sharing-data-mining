@@ -17,14 +17,14 @@ fitControl <- trainControl(method='repeatedcv', # 10-fold CV
                            number = 10, 
                            repeats =10) # repeated ten times
 # boosted tree model
-gbmFit1 <- train(count ~ season + holiday + workingday +　weather + temp + atemp +
-                     humidity + windspeed + casual +registered + hour + wd,
+gbmFit1 <- train(count ~ season + holiday + weather + wd+ hour + temp + atemp
+                 + humidity + windspeed,
                  data=train, method='gbm', trControl = fitControl, verbose=F)
 gbmFit1
-
+nrow(test)
 trellis.par.set(caretTheme())
 plot(gbmFit1)
 predictions <- predict(gbmFit1, test)
-gbmPrinted <- data.frame(rownames(test), predictions)
-head(gbmPrinted)
-write.table(x=gbmPrinted, file='gbm.csv')
+gbmPrinted <- data.frame(test$datetime, predictions)
+names(gbmPrinted)<- c('datetime', 'count')
+write.table(x=gbmPrinted, file='gbm.csv', sep=',', row.names=F)
