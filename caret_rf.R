@@ -1,4 +1,4 @@
-setwd("C:\\Users\\Ivan.Liuyanfeng\\Desktop\\Data_Mining_Work_Space\\bike-sharing-data-mining")
+setwd("/Users/ivan/Work_directory/bike-sharing-data-mining/")
 gc()
 require(lubridate)
 require(caret)
@@ -30,7 +30,7 @@ test$wd <- as.factor(test$wd)
 
 
 # parameter tuning
-set.seed(1234)  
+set.seed(888)  
 fitControl <- trainControl(method='cv', # 10-fold CV
                            10) # repeated ten times
 Grid <-  expand.grid(
@@ -38,21 +38,26 @@ Grid <-  expand.grid(
     interaction.depth = c(22) ,
     shrinkage = 0.2)
 # boosted tree model
-gbmFit1 <- train(as.factor(count) ~ ., data=train, method='gbm', trControl = fitControl, verbose=T,
+gbmFit1 <- train(count ~ ., data=train, method='gbm', trControl = fitControl, verbose=T,
                  tuneGrid = Grid)
 gbmFit1
 pred1 <- predict(gbmFit1, train)
 confusionMatrix(pred1, as.integer(train$count))
 
 # fit 2 poisson
-fit2 <- train(as.factor(count) ~ ., data=train, method='glm', verbose=T, family='poisson')
-
+eGrid <- expand.grid(.alpha = (1:10) * 0.1, .lambda = "all")
+Control <- trainControl(method = "repeatedcv",repeats = 3,verboseIter =TRUE)
+fit2 <- train(count~., data= train,
+              method = "glmnet",
+              tuneGrid = eGrid,
+              trControl = Control)
 # random forest
-fit3 <- train(as.factor(count) ~ . , data=train, method='rf', verbose=T, trControl=fitControl)
+tc <- trainControl("repeatedcv", number=10, repeats=10, classProbs=TRUE, savePred=T)
+fit3 <- train(count ~ . , data=train, method='rf', trControl=tc, preProc=c("center", "scale")))
 
 # predictions
 predictions <- predict(fit2, test)
 gbmPrinted <- data.frame(test$datetime, predictions)
 names(gbmPrinted)<- c('datetime', 'count')
 gbmPrinted[which(gbmPrinted$count < 0),'count'] <- 0
-write.table(x=gbmPrinted, file='gbm_cv.csv', sep=',', row.names=F)
+write.table(x=gbmPrinted, file='poisson_cv.csv', sep=',', row.names=F)
