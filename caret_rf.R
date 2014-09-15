@@ -52,12 +52,18 @@ fit2 <- train(count~., data= train,
               tuneGrid = eGrid,
               trControl = Control)
 # random forest
-tc <- trainControl("repeatedcv", number=10, repeats=10, classProbs=TRUE, savePred=T)
-fit3 <- train(count ~ . , data=train, method='rf', trControl=tc, preProc=c("center", "scale")))
+require(doMC)
+registerDoMC(cores=2)
+tc <- trainControl("repeatedcv", number=10, repeats=5, classProbs=TRUE, savePred=T, allowParallel = T)
+tc <- trainControl("cv",10, classProbs=TRUE, savePred=T)
+fit3_2 <- train(count ~ . , data=train, method='rf', trControl=tc, preProc=c("center", "scale"))
+pred3 <- predict(fit3, train)
+confusionMatrix(pred3, train$count)
+    # test set preProcess
 
 # predictions
-predictions <- predict(fit2, test)
+predictions <- predict(fit3, test)
 gbmPrinted <- data.frame(test$datetime, predictions)
 names(gbmPrinted)<- c('datetime', 'count')
 gbmPrinted[which(gbmPrinted$count < 0),'count'] <- 0
-write.table(x=gbmPrinted, file='poisson_cv.csv', sep=',', row.names=F)
+write.table(x=gbmPrinted, file='fr_cv_10.csv', sep=',', row.names=F)
