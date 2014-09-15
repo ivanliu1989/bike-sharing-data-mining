@@ -54,7 +54,7 @@ fit2 <- train(count~., data= train,
 # random forest
 require(doMC)
 registerDoMC(cores=2)
-tc <- trainControl("repeatedcv", number=10, repeats=5, classProbs=TRUE, savePred=T, allowParallel = T)
+tc <- trainControl("repeatedcv", number=10, repeats=10, classProbs=TRUE, savePred=T)
 tc <- trainControl("cv",10, classProbs=TRUE, savePred=T)
 fit3_2 <- train(count ~ . , data=train, method='rf', trControl=tc, preProc=c("center", "scale"),verbose=T)
 pred3 <- predict(fit3, train)
