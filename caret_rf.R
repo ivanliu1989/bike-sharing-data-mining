@@ -1,7 +1,6 @@
 setwd("/Users/ivan/Work_directory/bike-sharing-data-mining/")
 gc()
-require(lubridate)
-require(caret)
+require(lubridate);require(caret)
 # preprocessing
 train <- read.csv('Data/train.csv', head=T, stringsAsFactor=F)
 test <- read.csv('Data/test.csv', head=T, stringsAsFactor=F)
@@ -10,11 +9,8 @@ test$hour <- hour(test$datetime)
 train$wd <- wday(train$datetime)
 test$wd <- wday(test$datetime)
 test$count <- 0
-head(test)
-head(train)
-train <- train[,-1]
-train <- train[,-10]
-train <- train[,-9]
+head(test);head(train)
+train <- train[,-c(1,10,9)]
 train$season <- as.factor(train$season)
 train$holiday <- as.factor(train$holiday)
 train$workingday <- as.factor(train$workingday)
@@ -28,20 +24,16 @@ test$weather <- as.factor(test$weather)
 test$hour <- as.factor(test$hour)
 test$wd <- as.factor(test$wd)
 
-
 # parameter tuning
 set.seed(888)  
-fitControl <- trainControl(method='cv', # 10-fold CV
-                           10) # repeated ten times
-Grid <-  expand.grid(
-    n.trees = c(1000),
-    interaction.depth = c(22) ,
-    shrinkage = 0.2)
+fitControl <- trainControl(method = "adaptive_cv",number = 10,repeats = 5,classProbs = TRUE,
+                           summaryFunction = twoClassSummary,adaptive = list(min = 12,alpha = 0.05,method = "gls",complete = TRUE))
+# Grid <-  expand.grid()
 # boosted tree model
-gbmFit1 <- train(count ~ ., data=train, method='gbm', trControl = fitControl, verbose=T,
-                 tuneGrid = Grid)
-gbmFit1
-pred1 <- predict(gbmFit1, train)
+g <- train(count ~ ., data=train, method='rf', trControl = fitControl, verbose=T, metric = "RMSE", tuneLength=12)
+                 #tuneGrid = Grid)
+g
+pred1 <- predict(g, train)
 confusionMatrix(pred1, as.integer(train$count))
 
 # fit 2 poisson
