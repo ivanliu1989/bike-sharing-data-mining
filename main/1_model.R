@@ -1,5 +1,7 @@
 setwd("/Users/ivan/Work_directory/bike-sharing-data-mining/")
-gc()
+setwd('H:/Machine_Learning/bike-sharing-data-mining/')
+setwd('C:/Users/Ivan.Liuyanfeng/Desktop/Data_Mining_Work_Space/bike-sharing-data-mining/')
+rm(list=ls());gc()
 require(lubridate);require(caret)
 # preprocessing
 train <- read.csv('Data/train.csv', head=T, stringsAsFactor=F)
@@ -22,14 +24,16 @@ test$workingday <- as.factor(test$workingday)
 test$weather <- as.factor(test$weather)
 test$hour <- as.factor(test$hour)
 test$wd <- as.factor(test$wd)
-feature <- colnames(train[,-c(1,9,10)])
+feature_count <- colnames(train[,-c(1,9,10)])
+feature_casual <- colnames(train[,-c(1,10,11)])
+feature_registered <- colnames(train[,-c(1,9,11)])
 
 # parameter tuning
 set.seed(888)  
 fitControl <- trainControl(method = "adaptive_cv",number = 10,repeats = 5,classProbs = TRUE,
                            summaryFunction = defaultSummary,adaptive = list(min = 12,alpha = 0.05,method = "gls",complete = TRUE))
 # Grid <-  expand.grid()
-g <- train(count ~ ., data=train[,feature], method='rf', trControl = fitControl, verbose=T, metric = "RMSE", tuneLength=12)
+g <- train(count ~ ., data=train[,feature_count], method='rf', trControl = fitControl, verbose=T, metric = "RMSE", tuneLength=12)
 #tuneGrid = Grid)
 pred <- predict(g, train)
 confusionMatrix(pred, as.integer(train$count))
