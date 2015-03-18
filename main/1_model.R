@@ -36,4 +36,8 @@ fitControl <- trainControl(method = "adaptive_cv",number = 10,repeats = 5,classP
 g <- train(count ~ ., data=train[,feature_count], method='rf', trControl = fitControl, verbose=T, metric = "RMSE", tuneLength=8)
 #tuneGrid = Grid)
 pred <- predict(g, train)
-confusionMatrix(pred, as.integer(train$count))
+confusionMatrix(as.integer(pred), as.integer(train$count))
+
+#mtry=29
+res <- predict(g,test)
+submission <- cbind(test$)
